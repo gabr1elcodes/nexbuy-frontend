@@ -14,14 +14,13 @@ const FeaturedProducts: React.FC = () => {
 
   const getImageUrl = (path?: string) => {
   if (!path || path === "" || path.includes("undefined")) {
-    return "https://via.placeholder.com/300?text=Sem+Foto";
+    return "/logo-nexbuy.png";
   }
-  
   if (path.startsWith("http")) return path;
 
   const fileName = path.split('/').pop()?.split('\\').pop();
-
-  return `${API_URL}/uploads/${fileName}`;
+  const baseUrl = API_URL.replace(/\/$/, '');
+  return `${baseUrl}/uploads/${fileName}`;
 };
 
   useEffect(() => {

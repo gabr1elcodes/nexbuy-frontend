@@ -40,9 +40,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="relative h-64 w-full bg-gray-50 rounded-[2rem] overflow-hidden mb-4">
         <img 
-          src={image} 
+          src={`${import.meta.env.VITE_API_URL}/uploads/${image}`} 
           alt={name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+          onError={(e) => {
+            e.currentTarget.src = "/logo-nexbuy.png";
+          }}
         />
         
         <button className="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur-md rounded-full text-gray-400 hover:text-red-500 transition-colors shadow-sm">

@@ -19,11 +19,10 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const googleLogin = useGoogleLogin({
-  flow: 'auth-code', 
-  onSuccess: async (codeResponse) => {
+  onSuccess: async (tokenResponse) => {
     try {
       const response = await axios.post(`${API_URL}/auth/google`, {
-        token: codeResponse.code, 
+        token: tokenResponse.access_token,
       });
 
       if (response.data.token) {
@@ -33,7 +32,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Erro 401:", error);
-      toast.error("Erro ao autenticar com Google. Verifique o Client ID no Render.");
+      toast.error("Erro de autenticação no servidor");
     }
   },
   onError: () => toast.error("Falha no login com Google"),

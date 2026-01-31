@@ -86,7 +86,7 @@ export default function Login() {
       <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex items-center gap-3 mb-2">
           <img 
-            src={`${API_URL}/logo-nexbuy.png`} 
+            src="/logo-nexbuy.png" 
             alt="NexBuy" 
             className="w-10 h-10 object-contain" 
           />

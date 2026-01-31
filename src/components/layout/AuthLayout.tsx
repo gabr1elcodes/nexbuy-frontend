@@ -19,7 +19,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
           <div className="hidden lg:block lg:w-1/2 relative">
             <img
-              src={`${API_URL}/login-direita.png`}
+              src="/login-direita.png"
               alt="NexBuy Auth"
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -28,7 +28,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
         <div className="w-full rounded-[2rem] overflow-hidden shadow-xl h-32 sm:h-40 lg:h-48 border-4 border-white">
           <img
-            src={`${API_URL}/login-footer.png`}
+            src="/login-footer.png"
             alt="NexBuy Produtos"
             className="w-full h-full object-cover"
           />

@@ -40,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="relative h-64 w-full bg-gray-50 rounded-[2rem] overflow-hidden mb-4">
         <img 
-          src={`${import.meta.env.VITE_API_URL}/uploads/${image}`} 
+          src={image} 
           alt={name}
           className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {

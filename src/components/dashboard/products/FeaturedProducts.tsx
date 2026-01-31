@@ -13,13 +13,16 @@ const FeaturedProducts: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   const getImageUrl = (path?: string) => {
-    if (!path || path === "") return "https://via.placeholder.com/300?text=Sem+Foto";
-    if (path.startsWith("http")) return path;
-    let cleanPath = path.replace(/\\/g, "/").trim();
-    if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
-    const fileName = cleanPath.replace("uploads/", "");
-    return `${API_URL}/uploads/${fileName}`;
-  };
+  if (!path || path === "" || path.includes("undefined")) {
+    return "https://via.placeholder.com/300?text=Sem+Foto";
+  }
+  
+  if (path.startsWith("http")) return path;
+
+  const fileName = path.split('/').pop()?.split('\\').pop();
+
+  return `${API_URL}/uploads/${fileName}`;
+};
 
   useEffect(() => {
     const fetchProducts = async () => {

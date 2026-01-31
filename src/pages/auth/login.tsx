@@ -85,7 +85,11 @@ export default function Login() {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex items-center gap-3 mb-2">
-          <img src="NexbuyLogin.png" alt="NexBuy" className="w-10 h-10 object-contain" />
+          <img 
+            src={`${API_URL}/uploads/footerLogin.PNG`} 
+            alt="NexBuy" 
+            className="w-10 h-10 object-contain" 
+          />
           <span className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Nex<span className="text-orange-500">Buy</span>
           </span>
@@ -140,6 +144,23 @@ export default function Login() {
             {loading ? "Processando..." : "Entrar"}
           </button>
         </form>
+        <div className="mt-6 space-y-4">
+          <button
+            onClick={() => googleLogin()}
+            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all"
+          >
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+            Entrar com Google
+          </button>
+
+          <button
+            onClick={handleVisitorLogin}
+            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all text-gray-600"
+          >
+            <UserCheck size={20} />
+            Acessar como Visitante
+          </button>
+        </div>
       </div>
     </AuthLayout>
   );

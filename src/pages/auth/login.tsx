@@ -19,21 +19,26 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const response = await axios.post(`${API_URL}/auth/google`, {
-          token: tokenResponse.access_token,
-        });
+  onSuccess: async (tokenResponse) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/google`, {
+        token: tokenResponse.access_token,
+      });
 
+      if (response.data.token) {
         signInWithGoogle(response.data);
+        
         toast.success("Login realizado com sucesso!");
-        navigate("/dashboard");
-      } catch {
-        toast.error("Erro ao autenticar com Google");
+        
+        navigate("/dashboard"); 
       }
-    },
-    onError: () => toast.error("Falha no login com Google"),
-  });
+    } catch (error) {
+      console.error("Erro detalhado:", error);
+      toast.error("Erro ao autenticar com Google");
+    }
+  },
+  onError: () => toast.error("Falha no login com Google"),
+});
 
   if (loading) {
     return (
@@ -145,7 +150,6 @@ export default function Login() {
           </button>
         </form>
         <div className="mt-6 flex flex-row gap-4">
-
           <button
             type="button"
             onClick={() => googleLogin()}

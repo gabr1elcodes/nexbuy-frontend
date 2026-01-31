@@ -44,6 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           alt={name}
           className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
+            // Se a imagem falhar, ele mostra o logo
             e.currentTarget.src = "/logo-nexbuy.png";
           }}
         />

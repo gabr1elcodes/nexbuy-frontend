@@ -86,7 +86,7 @@ export default function Login() {
       <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex items-center gap-3 mb-2">
           <img 
-            src={`${API_URL}/uploads/footerLogin.PNG`} 
+            src={`${API_URL}/uploads/logo-nexbuy.png`} 
             alt="NexBuy" 
             className="w-10 h-10 object-contain" 
           />
@@ -144,31 +144,35 @@ export default function Login() {
             {loading ? "Processando..." : "Entrar"}
           </button>
         </form>
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          {/* Botão de Visitante (Laranja e à esquerda) */}
-          <button
-            type="button"
-            onClick={handleVisitorLogin}
-            className="flex items-center justify-center gap-2 h-12 rounded-2xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-md shadow-orange-100 transition-all active:scale-[0.98]"
-          >
-            <UserCheck size={20} />
-            Visitante
-          </button>
+        <div className="mt-6 flex flex-row gap-4">
 
-          {/* Botão do Google (Branco e à direita) */}
           <button
             type="button"
             onClick={() => googleLogin()}
-            className="flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium bg-white hover:bg-gray-50 transition-all active:scale-[0.98]"
+            className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all"
           >
-            <img 
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-              alt="Google" 
-              className="w-5 h-5" 
-            />
-            Google
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+            Entrar com Google
+          </button>
+
+
+          <button
+            type="button"
+            onClick={handleVisitorLogin}
+            className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-orange-100 bg-orange-50/50 font-medium text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+          >
+            <UserCheck size={20} />
+            Acessar como Visitante
           </button>
         </div>
+
+
+        <p className="mt-8 text-center text-sm text-gray-500">
+          Não tem uma conta?{" "}
+          <Link to="/register" className="font-bold text-orange-500 hover:text-orange-600 transition-colors">
+            Cadastre-se
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   );

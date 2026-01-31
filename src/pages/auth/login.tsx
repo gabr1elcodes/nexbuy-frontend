@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
+import { GoogleLogin } from '@react-oauth/google';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -148,25 +149,42 @@ export default function Login() {
           </button>
         </form>
         <div className="mt-6 flex flex-row gap-4">
-          <button
-            type="button"
-            onClick={() => googleLogin()}
-            className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-            Entrar com Google
-          </button>
 
+        <div className="w-1/2">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const response = await axios.post(`${API_URL}/auth/google`, {
+                  token: credentialResponse.credential, 
+                });
 
-          <button
-            type="button"
-            onClick={handleVisitorLogin}
-            className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-orange-100 bg-orange-50/50 font-medium text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
-          >
-            <UserCheck size={20} />
-            Acessar como Visitante
-          </button>
+                if (response.data.token) {
+                  signInWithGoogle(response.data);
+                  toast.success("Login realizado com sucesso!");
+                  navigate("/dashboard");
+                }
+              } catch (error) {
+                console.error("Erro detalhado:", error);
+                toast.error("Erro ao autenticar no servidor. Verifique o Secret no Render.");
+              }
+            }}
+            onError={() => toast.error("Falha no login com Google")}
+            theme="outline"
+            size="large"
+            shape="pill"
+            width="100%"
+          />
         </div>
+
+        <button
+          type="button"
+          onClick={handleVisitorLogin}
+          className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-orange-100 bg-orange-50/50 font-medium text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+        >
+          <UserCheck size={20} />
+          Acessar como Visitante
+        </button>
+      </div>
 
 
         <p className="mt-8 text-center text-sm text-gray-500">

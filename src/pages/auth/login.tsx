@@ -179,9 +179,9 @@ export default function Login() {
         <button
           type="button"
           onClick={handleVisitorLogin}
-          className="w-1/2 flex items-center justify-center gap-2 h-12 rounded-2xl border border-orange-100 bg-orange-50/50 font-medium text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+          className="w-1/2 flex items-center justify-center gap-2 h-[40px] rounded-full border border-[#dadce0] bg-white font-medium text-[#3c4043] hover:bg-[#f8f9fa] hover:border-[#d2e3fc] transition-all text-sm"
         >
-          <UserCheck size={20} />
+          <UserCheck size={18} className="text-orange-500" />
           Acessar como Visitante
         </button>
       </div>

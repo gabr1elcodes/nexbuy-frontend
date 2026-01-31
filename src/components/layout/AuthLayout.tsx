@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             <img
               src="/login-direita.png"
               alt="NexBuy Auth"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-right" 
             />
           </div>
         </div>
@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           <img
             src="/login-footer.png"
             alt="NexBuy Produtos"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-[center_40%]"
           />
         </div>
       </div>

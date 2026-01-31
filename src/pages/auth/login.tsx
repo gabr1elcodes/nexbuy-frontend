@@ -144,21 +144,29 @@ export default function Login() {
             {loading ? "Processando..." : "Entrar"}
           </button>
         </form>
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          {/* Botão de Visitante (Laranja e à esquerda) */}
           <button
-            onClick={() => googleLogin()}
-            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-            Entrar com Google
-          </button>
-
-          <button
+            type="button"
             onClick={handleVisitorLogin}
-            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium hover:bg-gray-50 transition-all text-gray-600"
+            className="flex items-center justify-center gap-2 h-12 rounded-2xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-md shadow-orange-100 transition-all active:scale-[0.98]"
           >
             <UserCheck size={20} />
-            Acessar como Visitante
+            Visitante
+          </button>
+
+          {/* Botão do Google (Branco e à direita) */}
+          <button
+            type="button"
+            onClick={() => googleLogin()}
+            className="flex items-center justify-center gap-2 h-12 rounded-2xl border border-gray-200 font-medium bg-white hover:bg-gray-50 transition-all active:scale-[0.98]"
+          >
+            <img 
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+              alt="Google" 
+              className="w-5 h-5" 
+            />
+            Google
           </button>
         </div>
       </div>

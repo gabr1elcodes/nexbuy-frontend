@@ -213,7 +213,7 @@ export default function Inventory() {
             </div>
             <div>
               <h1 className={`text-2xl font-black uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                Nex<span className="text-orange-500">Buy</span> <span className={`font-light ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Stock</span>
+                Nex<span className="text-orange-500">Buy</span> <span className={`font-light ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>MarketPlace</span>
               </h1>
               <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
                 <LayoutDashboard size={12} className="text-blue-500" /> Gestão de Ativos

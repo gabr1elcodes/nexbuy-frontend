@@ -3,7 +3,8 @@ import ProductCard from "./ProductCard";
 import ProductDetails from "./ProductDetails";
 import { getAllProducts } from "../../../services/products/products.service";
 import { Sparkles } from "lucide-react";
-import api from "@/services/api";
+import { getCachedProducts, setCachedProducts } from "@/services/products/products.cache";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,17 +25,28 @@ const FeaturedProducts: React.FC = () => {
 };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllProducts();
-        const availableProducts = data.filter((p: any) => p.stock > 0);
-        setProducts(availableProducts);
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
+  const fetchProducts = async () => {
+    try {
+      const cached = getCachedProducts();
+
+      if (cached) {
+        setProducts(cached);
+        return;
       }
-    };
-    fetchProducts();
-  }, []);
+
+      const data = await getAllProducts();
+      const availableProducts = data.filter((p: any) => p.stock > 0);
+
+      setProducts(availableProducts);
+      setCachedProducts(availableProducts);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
 
   const limit = 6;
   const displayedProducts = isExpanded ? products : products.slice(0, limit);

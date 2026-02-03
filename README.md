@@ -134,5 +134,7 @@ Se você é dev, tech lead ou recrutador, fico aberto a trocar ideias 🚀
 
 Gabriel Oliveira
 Desenvolvedor Full Stack React + Node.js
+<br>
+<br>
 🔗 GitHub: https://github.com/gabr1elcodes
-- Linkedin: https://www.linkedin.com/in/gabriel-oliveira-871b06359/
+ Linkedin: https://www.linkedin.com/in/gabriel-oliveira-871b06359/

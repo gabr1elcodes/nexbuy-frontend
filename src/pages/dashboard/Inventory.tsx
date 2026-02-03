@@ -50,7 +50,7 @@ export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const userEmail = localStorage.getItem("@nexbuy:userEmail");
-  const isAdmin = userEmail === "admin@nexbuy.com";
+  const isAdmin = userEmail === "gabrieloliveira30p@gmail.com";
 
   const [formData, setFormData] = useState<ProductForm>({
     name: "",

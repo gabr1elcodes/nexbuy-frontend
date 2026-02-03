@@ -44,7 +44,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           alt={name}
           className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
-            // Se a imagem falhar, ele mostra o logo
             e.currentTarget.src = "/logo-nexbuy.png";
           }}
         />
@@ -80,7 +79,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {price}
           </span>
           
-          {/* EXIBIÇÃO DINÂMICA: Só aparece se existir no banco */}
           {oldPrice && (
             <span className="text-[10px] text-gray-400 font-bold line-through opacity-50">
               {oldPrice}

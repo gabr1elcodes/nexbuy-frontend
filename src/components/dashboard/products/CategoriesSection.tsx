@@ -39,7 +39,6 @@ const CategoriesSection: FC = () => {
         </button>
       </div>
 
-      {/* Grid: gap-3 mantido para proximidade ideal */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {CATEGORIES.map((cat) => (
           <div key={cat.id} className="relative group cursor-pointer">

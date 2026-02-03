@@ -49,6 +49,8 @@ export default function Inventory() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const userEmail = localStorage.getItem("@nexbuy:userEmail");
+  const isAdmin = userEmail === "admin@nexbuy.com";
 
   const [formData, setFormData] = useState<ProductForm>({
     name: "",
@@ -124,6 +126,7 @@ export default function Inventory() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isAdmin) return;
     const file = e.target.files?.[0];
     if (!file) return;
     setFormData((prev) => ({
@@ -134,45 +137,51 @@ export default function Inventory() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const toastId = toast.loading(editingProduct ? "Salvando..." : "Cadastrando...");
-
-  try {
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("description", formData.description);
-    
-    data.append("price", String(formData.price));
-    data.append("stock", String(formData.stock));
-
-    if (formData.oldPrice && formData.oldPrice.trim() !== "") {
-      data.append("oldPrice", String(formData.oldPrice));
+    e.preventDefault();
+    if (!isAdmin) {
+      toast.error("Ação não permitida para visitantes");
+      return;
     }
 
-    if (formData.file) {
-      data.append("image", formData.file);
+    const toastId = toast.loading(editingProduct ? "Salvando..." : "Cadastrando...");
+
+    try {
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      data.append("price", String(formData.price));
+      data.append("stock", String(formData.stock));
+
+      if (formData.oldPrice && formData.oldPrice.trim() !== "") {
+        data.append("oldPrice", String(formData.oldPrice));
+      }
+
+      if (formData.file) {
+        data.append("image", formData.file);
+      }
+
+      if (editingProduct) {
+        await api.put(`/products/${editingProduct._id}`, data);
+        toast.success("Atualizado com sucesso!", { id: toastId });
+      } else {
+        await api.post("/products", data);
+        toast.success("Produto criado com sucesso!", { id: toastId });
+      }
+
+      closeModal();
+      loadProducts();
+    } catch (error: any) {
+      console.error("ERRO NO BACKEND:", error.response?.data || error.message);
+      const msgErro = error.response?.data?.message || "Erro na operação";
+      toast.error(msgErro, { id: toastId });
     }
-
-    if (editingProduct) {
-      await api.put(`/products/${editingProduct._id}`, data);
-      toast.success("Atualizado com sucesso!", { id: toastId });
-    } else {
-      await api.post("/products", data);
-      toast.success("Produto criado com sucesso!", { id: toastId });
-    }
-
-    closeModal();
-    loadProducts();
-  } catch (error: any) {
-
-    console.error("ERRO NO BACKEND:", error.response?.data || error.message);
-    
-    const msgErro = error.response?.data?.message || "Erro na operação";
-    toast.error(msgErro, { id: toastId });
-  }
-};
+  };
 
   const handleDelete = (id: string) => {
+    if (!isAdmin) {
+      toast.error("Acesso negado");
+      return;
+    }
     toast((t) => (
       <div className={`flex flex-col gap-3 min-w-[250px] p-1 ${!isDarkMode && 'text-slate-800'}`}>
         <div className="flex items-center gap-2">
@@ -297,7 +306,7 @@ export default function Inventory() {
 
                   <div className="flex gap-2 pt-1">
                     <button onClick={() => openEditModal(product)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all border ${isDarkMode ? 'bg-slate-700/50 hover:bg-blue-600 text-white border-slate-600' : 'bg-slate-50 hover:bg-blue-50 text-slate-700 border-slate-200'}`}>
-                      <Pencil size={14} /> Editar
+                      <Pencil size={14} /> {isAdmin ? "Editar" : "Ver Detalhes"}
                     </button>
                     <button onClick={() => handleDelete(product._id)} className={`px-3 flex items-center justify-center rounded-xl transition-all border ${isDarkMode ? 'bg-slate-700/50 hover:bg-red-500/20 text-slate-500 hover:text-red-500 border-slate-600' : 'bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-500 border-slate-200'}`}>
                       <Trash2 size={16} />
@@ -315,7 +324,7 @@ export default function Inventory() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                   <Tag size={20} className="text-orange-400" />
-                  {editingProduct ? "Refinar Item" : "Novo Cadastro"}
+                  {editingProduct ? (isAdmin ? "Refinar Item" : "Detalhes do Item") : "Novo Cadastro"}
                 </h2>
               </div>
 
@@ -323,18 +332,20 @@ export default function Inventory() {
                 <div className="space-y-4">
                   <input
                     type="text"
+                    disabled={!isAdmin}
                     placeholder="Nome do produto"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className={`w-full border rounded-xl p-3.5 outline-none transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white focus:ring-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-blue-500'}`}
+                    className={`w-full border rounded-xl p-3.5 outline-none transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white focus:ring-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-blue-500'} disabled:opacity-60`}
                     required
                   />
                   
                   <textarea
+                    disabled={!isAdmin}
                     placeholder="Descrição técnica"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className={`w-full border rounded-xl p-3.5 outline-none transition-all h-24 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white focus:ring-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-blue-500'}`}
+                    className={`w-full border rounded-xl p-3.5 outline-none transition-all h-24 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white focus:ring-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-blue-500'} disabled:opacity-60`}
                     required
                   />
 
@@ -343,10 +354,11 @@ export default function Inventory() {
                       <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Preço Atual</label>
                       <input
                         type="number"
+                        disabled={!isAdmin}
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} disabled:opacity-60`}
                         required
                       />
                     </div>
@@ -354,25 +366,27 @@ export default function Inventory() {
                       <label className={`text-[10px] font-bold uppercase ml-1 ${isDarkMode ? 'text-orange-500/80' : 'text-orange-600'}`}>P. Antigo</label>
                       <input
                         type="number"
+                        disabled={!isAdmin}
                         step="0.01"
                         value={formData.oldPrice}
                         onChange={(e) => setFormData({ ...formData, oldPrice: e.target.value })}
-                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} disabled:opacity-60`}
                       />
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Estoque</label>
                       <input
                         type="number"
+                        disabled={!isAdmin}
                         value={formData.stock}
                         onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                        className={`w-full border rounded-xl p-3 outline-none ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} disabled:opacity-60`}
                         required
                       />
                     </div>
                   </div>
 
-                  <label className={`flex items-center gap-4 p-4 border-2 border-dashed rounded-xl cursor-pointer transition group ${isDarkMode ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'}`}>
+                  <label className={`flex items-center gap-4 p-4 border-2 border-dashed rounded-xl transition group ${isDarkMode ? 'border-slate-700' : 'border-slate-200'} ${isAdmin ? 'cursor-pointer hover:bg-slate-800' : 'cursor-default opacity-60'}`}>
                     {formData.previewUrl ? (
                       <img src={formData.previewUrl} className="w-12 h-12 rounded-lg object-cover" alt="Preview" />
                     ) : (
@@ -381,14 +395,17 @@ export default function Inventory() {
                       </div>
                     )}
                     <span className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Foto do Produto</span>
-                    <input type="file" onChange={handleFileChange} className="hidden" />
+                    <input type="file" disabled={!isAdmin} onChange={handleFileChange} className="hidden" />
                   </label>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-slate-100/10">
                   <button type="button" onClick={closeModal} className={`px-6 py-2 font-bold transition ${isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}>Cancelar</button>
-                  <button type="submit" className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl transition shadow-lg shadow-orange-500/20 active:scale-95">
-                    {editingProduct ? "Atualizar" : "Salvar"}
+                  <button 
+                    type="submit" 
+                    className={`px-8 py-3 font-black rounded-xl transition shadow-lg active:scale-95 ${isAdmin ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20' : 'bg-slate-700 text-slate-400 cursor-not-allowed shadow-none'}`}
+                  >
+                    {isAdmin ? (editingProduct ? "Atualizar" : "Salvar") : "Apenas leitura"}
                   </button>
                 </div>
               </form>

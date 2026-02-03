@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ArrowLeft,
+  Package,
+} from "lucide-react";
+
 import api from "@/services/api";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -14,29 +23,24 @@ interface Product {
 }
 
 export default function Inventory() {
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  const [formData, setFormData] = useState<{
-    name: string;
-    description: string;
-    price: string;
-    stock: string;
-    file: File | null;
-    previewUrl: string | null;
-  }>({
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     stock: "",
-    file: null,
-    previewUrl: null,
+    file: null as File | null,
+    previewUrl: null as string | null,
   });
 
   const getImageUrl = (image?: string) => {
-    if (!image) return "https://via.placeholder.com/300x200?text=Sem+Imagem";
+    if (!image) return "https://via.placeholder.com/400x250?text=Sem+Imagem";
     if (image.startsWith("http") || image.startsWith("blob:")) return image;
     return `${API_URL}/uploads/${image}`;
   };
@@ -104,6 +108,10 @@ export default function Inventory() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const toastId = toast.loading(
+      editingProduct ? "Atualizando produto..." : "Criando produto..."
+    );
+
     try {
       const data = new FormData();
       data.append("name", formData.name);
@@ -117,45 +125,64 @@ export default function Inventory() {
 
       if (editingProduct) {
         await api.put(`/products/${editingProduct._id}`, data);
-        toast.success("Produto atualizado com sucesso");
+        toast.success("Produto atualizado com sucesso", { id: toastId });
       } else {
         await api.post("/products", data);
-        toast.success("Produto criado com sucesso");
+        toast.success("Produto criado com sucesso", { id: toastId });
       }
 
       closeModal();
       loadProducts();
     } catch {
-      toast.error("Erro ao salvar produto");
+      toast.error("Erro ao salvar produto", { id: toastId });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Deseja realmente excluir este produto?")) return;
 
+    const toastId = toast.loading("Excluindo produto...");
+
     try {
       await api.delete(`/products/${id}`);
-      toast.success("Produto removido");
+      toast.success("Produto removido", { id: toastId });
       loadProducts();
     } catch {
-      toast.error("Erro ao deletar produto");
+      toast.error("Erro ao deletar produto", { id: toastId });
     }
   };
 
   return (
-    <div className="px-4 py-4 md:px-6 md:py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Gestão de Inventário
-        </h1>
-        <button
-          onClick={openCreateModal}
-          className="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-        >
-          + Novo Produto
-        </button>
+    <div className="px-4 py-4 md:px-8 md:py-8 space-y-6 bg-gray-50 min-h-screen">
+      {/* HEADER */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Package className="text-blue-600" size={32} />
+          <h1 className="text-3xl font-bold text-gray-800">
+            Inventário
+          </h1>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border bg-white hover:bg-gray-100 transition"
+          >
+            <ArrowLeft size={18} />
+            Home
+          </button>
+
+          <button
+            onClick={openCreateModal}
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+          >
+            <Plus size={18} />
+            Novo Produto
+          </button>
+        </div>
       </div>
 
+      {/* CONTENT */}
       {loading ? (
         <div className="text-center text-gray-500 py-20">
           Carregando produtos...
@@ -165,14 +192,14 @@ export default function Inventory() {
           {products.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden"
+              className="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden"
             >
               <img
                 src={getImageUrl(product.image)}
                 className="w-full h-44 object-cover"
               />
 
-              <div className="p-4 space-y-2">
+              <div className="p-4 space-y-3">
                 <h3 className="font-bold text-lg text-gray-800 truncate">
                   {product.name}
                 </h3>
@@ -199,14 +226,17 @@ export default function Inventory() {
                 <div className="flex gap-2 pt-2">
                   <button
                     onClick={() => openEditModal(product)}
-                    className="flex-1 py-1.5 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 transition"
+                    className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 transition"
                   >
+                    <Pencil size={16} />
                     Editar
                   </button>
+
                   <button
                     onClick={() => handleDelete(product._id)}
-                    className="flex-1 py-1.5 rounded-lg border border-red-500 text-red-600 hover:bg-red-50 transition"
+                    className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-red-500 text-red-600 hover:bg-red-50 transition"
                   >
+                    <Trash2 size={16} />
                     Excluir
                   </button>
                 </div>
@@ -216,8 +246,9 @@ export default function Inventory() {
         </div>
       )}
 
+      {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <form
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4"
@@ -279,7 +310,7 @@ export default function Inventory() {
             )}
 
             <label className="block text-center border-2 border-dashed rounded-xl p-4 cursor-pointer hover:bg-gray-50">
-              Trocar imagem
+              Selecionar imagem
               <input
                 type="file"
                 accept="image/*"

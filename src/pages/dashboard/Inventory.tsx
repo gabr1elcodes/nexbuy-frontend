@@ -134,32 +134,43 @@ export default function Inventory() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const toastId = toast.loading(editingProduct ? "Salvando..." : "Cadastrando...");
+  e.preventDefault();
+  const toastId = toast.loading(editingProduct ? "Salvando..." : "Cadastrando...");
 
-    try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("description", formData.description);
-      data.append("price", formData.price);
-      data.append("oldPrice", formData.oldPrice);
-      data.append("stock", formData.stock);
-      if (formData.file) data.append("image", formData.file);
+  try {
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    
+    data.append("price", String(formData.price));
+    data.append("stock", String(formData.stock));
 
-      if (editingProduct) {
-        await api.put(`/products/${editingProduct._id}`, data);
-        toast.success("Atualizado!", { id: toastId });
-      } else {
-        await api.post("/products", data);
-        toast.success("Criado!", { id: toastId });
-      }
-
-      closeModal();
-      loadProducts();
-    } catch {
-      toast.error("Erro na operação", { id: toastId });
+    if (formData.oldPrice && formData.oldPrice.trim() !== "") {
+      data.append("oldPrice", String(formData.oldPrice));
     }
-  };
+
+    if (formData.file) {
+      data.append("image", formData.file);
+    }
+
+    if (editingProduct) {
+      await api.put(`/products/${editingProduct._id}`, data);
+      toast.success("Atualizado com sucesso!", { id: toastId });
+    } else {
+      await api.post("/products", data);
+      toast.success("Produto criado com sucesso!", { id: toastId });
+    }
+
+    closeModal();
+    loadProducts();
+  } catch (error: any) {
+
+    console.error("ERRO NO BACKEND:", error.response?.data || error.message);
+    
+    const msgErro = error.response?.data?.message || "Erro na operação";
+    toast.error(msgErro, { id: toastId });
+  }
+};
 
   const handleDelete = (id: string) => {
     toast((t) => (

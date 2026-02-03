@@ -23,7 +23,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("@nexbuy:token");
       localStorage.removeItem("@nexbuy:userEmail");
-      // Opcional: window.location.href = "/login"; 
     }
     return Promise.reject(error);
   }

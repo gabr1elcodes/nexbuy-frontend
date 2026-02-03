@@ -12,12 +12,6 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    if (config.data instanceof FormData) {
-      delete config.headers["Content-Type"];
-    } else {
-      config.headers["Content-Type"] = "application/json";
-    }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -29,6 +23,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("@nexbuy:token");
       localStorage.removeItem("@nexbuy:userEmail");
+      // Opcional: window.location.href = "/login"; 
     }
     return Promise.reject(error);
   }

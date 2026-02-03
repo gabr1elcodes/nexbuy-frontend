@@ -36,7 +36,7 @@ export default function Inventory() {
   });
 
   const getImageUrl = (image?: string) => {
-    if (!image) return "https://via.placeholder.com/150?text=Sem+Foto";
+    if (!image) return "https://via.placeholder.com/300x200?text=Sem+Imagem";
     if (image.startsWith("http") || image.startsWith("blob:")) return image;
     return `${API_URL}/uploads/${image}`;
   };
@@ -131,11 +131,11 @@ export default function Inventory() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja deletar este produto?")) return;
+    if (!confirm("Deseja realmente excluir este produto?")) return;
 
     try {
       await api.delete(`/products/${id}`);
-      toast.success("Produto deletado");
+      toast.success("Produto removido");
       loadProducts();
     } catch {
       toast.error("Erro ao deletar produto");
@@ -143,80 +143,97 @@ export default function Inventory() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestão de Inventário</h1>
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Gestão de Inventário
+        </h1>
         <button
           onClick={openCreateModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
         >
-          Novo Produto
+          + Novo Produto
         </button>
       </div>
 
       {loading ? (
-        <p>Carregando...</p>
+        <div className="text-center text-gray-500 py-20">
+          Carregando produtos...
+        </div>
       ) : (
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2">Imagem</th>
-              <th className="p-2">Nome</th>
-              <th className="p-2">Preço</th>
-              <th className="p-2">Estoque</th>
-              <th className="p-2">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product._id} className="border-t">
-                <td className="p-2">
-                  <img
-                    src={getImageUrl(product.image)}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                </td>
-                <td className="p-2">{product.name}</td>
-                <td className="p-2">R$ {product.price}</td>
-                <td className="p-2">{product.stock}</td>
-                <td className="p-2 space-x-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <div
+              key={product._id}
+              className="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden"
+            >
+              <img
+                src={getImageUrl(product.image)}
+                className="w-full h-44 object-cover"
+              />
+
+              <div className="p-4 space-y-2">
+                <h3 className="font-bold text-lg text-gray-800 truncate">
+                  {product.name}
+                </h3>
+
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  {product.description}
+                </p>
+
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-blue-600">
+                    R$ {product.price}
+                  </span>
+                  <span
+                    className={
+                      product.stock > 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    Estoque: {product.stock}
+                  </span>
+                </div>
+
+                <div className="flex gap-2 pt-2">
                   <button
                     onClick={() => openEditModal(product)}
-                    className="text-blue-600"
+                    className="flex-1 py-1.5 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 transition"
                   >
                     Editar
                   </button>
                   <button
                     onClick={() => handleDelete(product._id)}
-                    className="text-red-600"
+                    className="flex-1 py-1.5 rounded-lg border border-red-500 text-red-600 hover:bg-red-50 transition"
                   >
                     Excluir
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <form
             onSubmit={handleSubmit}
-            className="bg-white p-6 rounded w-full max-w-md space-y-4"
+            className="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4"
           >
-            <h2 className="text-xl font-bold">
+            <h2 className="text-2xl font-bold text-gray-800">
               {editingProduct ? "Editar Produto" : "Novo Produto"}
             </h2>
 
             <input
               type="text"
-              placeholder="Nome"
+              placeholder="Nome do produto"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full border p-2 rounded"
+              className="w-full border rounded-xl p-3"
               required
             />
 
@@ -226,62 +243,62 @@ export default function Inventory() {
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full border p-2 rounded"
+              className="w-full border rounded-xl p-3"
+              rows={3}
               required
             />
 
-            <input
-              type="number"
-              placeholder="Preço"
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              className="w-full border p-2 rounded"
-              required
-            />
-
-            <input
-              type="number"
-              placeholder="Estoque"
-              value={formData.stock}
-              onChange={(e) =>
-                setFormData({ ...formData, stock: e.target.value })
-              }
-              className="w-full border p-2 rounded"
-              required
-            />
-
-            <div className="relative">
-              {formData.previewUrl && (
-                <img
-                  src={formData.previewUrl}
-                  className="w-full h-40 object-cover rounded mb-2"
-                />
-              )}
-
-              <label className="block border p-2 rounded text-center cursor-pointer bg-gray-100">
-                Trocar imagem
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-              </label>
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                type="number"
+                placeholder="Preço"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                className="border rounded-xl p-3"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Estoque"
+                value={formData.stock}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock: e.target.value })
+                }
+                className="border rounded-xl p-3"
+                required
+              />
             </div>
 
-            <div className="flex justify-end gap-2">
+            {formData.previewUrl && (
+              <img
+                src={formData.previewUrl}
+                className="w-full h-40 object-cover rounded-xl"
+              />
+            )}
+
+            <label className="block text-center border-2 border-dashed rounded-xl p-4 cursor-pointer hover:bg-gray-50">
+              Trocar imagem
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={closeModal}
-                className="px-4 py-2 border rounded"
+                className="px-4 py-2 rounded-xl border"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold"
               >
                 Salvar
               </button>

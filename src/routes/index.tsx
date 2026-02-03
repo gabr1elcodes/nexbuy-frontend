@@ -4,8 +4,8 @@ import Register from "../pages/auth/register";
 import ForgotPassword from "../pages/auth/forgotpassword";
 import DashboardHome from "../pages/dashboard/DashboardHome";
 import { PrivateRoute } from "./PrivateRoute";
-import { AdminRoute } from "./AdminRoute"; // 1. Importe o novo guarda
-import Products from '../services/products/Products';
+import { AdminRoute } from "./AdminRoute";
+import Products from '../pages/dashboard/Inventory';
 
 export default function AppRoutes() {
   return (
@@ -29,7 +29,7 @@ export default function AppRoutes() {
             </AdminRoute>
           } 
         />
-
+        
         {/* Dashboard para qualquer logado */}
         <Route
           path="/dashboard"

@@ -12,10 +12,9 @@ interface DashboardModaisProps {
   setOpenLogout: (open: boolean) => void;
   openOrders: boolean;
   setOpenOrders: (open: boolean) => void;
-  // ADICIONE ESTAS DUAS LINHAS ABAIXO:
   openSettings: boolean; 
   setOpenSettings: (open: boolean) => void;
-  // ---
+
   handleLogout: () => void;
   userInitials: string;
   displayEmail: string;
@@ -33,7 +32,7 @@ const DashboardModais: FC<DashboardModaisProps> = (props) => {
 
   return (
     <>
-      {/* Toast System */}
+
       {toast?.show && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-10 duration-300">
           <div className="bg-gray-900/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10">
@@ -43,7 +42,7 @@ const DashboardModais: FC<DashboardModaisProps> = (props) => {
         </div>
       )}
 
-      {/* Orquestração dos Modais */}
+
       <ProfileModal 
         isOpen={props.openProfile} 
         onClose={() => props.setOpenProfile(false)} 
@@ -65,11 +64,11 @@ const DashboardModais: FC<DashboardModaisProps> = (props) => {
         onClose={() => props.setOpenOrders(false)} 
       />
 
-      {/* SettingsModal agora com as props corretas da interface */}
+
       <SettingsModal
         isOpen={props.openSettings}
         onClose={() => props.setOpenSettings(false)}
-        showToast={showToast} // Usando o sistema de toast real agora
+        showToast={showToast}
       />
     </>
   );

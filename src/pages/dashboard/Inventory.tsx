@@ -52,9 +52,9 @@ export default function Inventory() {
   const isAdmin = userEmail === "gabrieloliveira30p@gmail.com";
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
-  const savedTheme = localStorage.getItem("@nexbuy:theme");
-  return savedTheme ? savedTheme === "dark" : true;
-});
+    const savedTheme = localStorage.getItem("@nexbuy:theme");
+    return savedTheme ? savedTheme === "dark" : true;
+  });
 
   const [formData, setFormData] = useState<ProductForm>({
     name: "",
@@ -92,7 +92,13 @@ export default function Inventory() {
     loadProducts();
   }, []);
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => {
+      const newMode = !prev;
+      localStorage.setItem("@nexbuy:theme", newMode ? "dark" : "light");
+      return newMode;
+    });
+  };
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -193,9 +199,9 @@ export default function Inventory() {
           <span className="font-medium text-sm">Excluir este produto?</span>
         </div>
         <div className="flex justify-end gap-2">
-          <button 
+          <button
             type="button"
-            onClick={() => toast.dismiss(t.id)} 
+            onClick={() => toast.dismiss(t.id)}
             className="px-3 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-md transition"
           >
             Cancelar
@@ -209,8 +215,8 @@ export default function Inventory() {
                 await api.delete(`/products/${id}`);
                 toast.success("Removido!", { id: tid });
                 loadProducts();
-              } catch { 
-                toast.error("Erro!", { id: tid }); 
+              } catch {
+                toast.error("Erro!", { id: tid });
               }
             }}
             className="px-4 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 transition"
@@ -246,7 +252,7 @@ export default function Inventory() {
           </div>
 
           <div className="flex gap-3 w-full md:w-auto">
-            <button 
+            <button
               onClick={toggleTheme}
               className={`p-3 rounded-xl border transition shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400 hover:bg-slate-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
             >
@@ -281,13 +287,13 @@ export default function Inventory() {
                 <div className="relative h-48">
                   <img src={getImageUrl(product.image)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={product.name} />
                   <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`} />
-                  
+
                   {product.oldPrice && Number(product.oldPrice) > product.price && (
                     <div className="absolute top-4 left-4 bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded-lg uppercase shadow-lg shadow-orange-500/40">
                       Promoção
                     </div>
                   )}
-                  
+
                   <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-white">
                     <span className="px-2 py-1 rounded-lg text-[10px] font-bold uppercase border bg-white/10 backdrop-blur-md border-white/20">
                       Qtd: {product.stock}
@@ -343,7 +349,7 @@ export default function Inventory() {
                     className={`w-full border rounded-xl p-3.5 outline-none transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white focus:ring-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:ring-blue-500'} disabled:opacity-60`}
                     required
                   />
-                  
+
                   <textarea
                     disabled={!isAdmin}
                     placeholder="Descrição técnica"
@@ -405,8 +411,8 @@ export default function Inventory() {
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-slate-100/10">
                   <button type="button" onClick={closeModal} className={`px-6 py-2 font-bold transition ${isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}>Cancelar</button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className={`px-8 py-3 font-black rounded-xl transition shadow-lg active:scale-95 ${isAdmin ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20' : 'bg-slate-700 text-slate-400 cursor-not-allowed shadow-none'}`}
                   >
                     {isAdmin ? (editingProduct ? "Atualizar" : "Salvar") : "Apenas leitura"}

@@ -54,21 +54,25 @@ export default function Login() {
     );
   }
 
-  async function handleVisitorLogin() {
-    setLoading(true);
-    const toastId = toastLoading("Acessando como visitante...");
+  function handleVisitorLogin() {
+  const toastId = toastLoading("Entrando como visitante...");
 
-    try {
-      await signIn("visitante@nexbuy.com", "visitante123");
-      localStorage.setItem("@nexbuy:userEmail", "visitante@nexbuy.com");
+  setTimeout(() => {
+    signInWithGoogle({
+      token: "visitor-token",
+      user: {
+        id: "visitor",
+        name: "Visitante",
+        email: "visitante@nexbuy.com",
+        role: "visitor",
+      },
+    });
 
-      toastUpdateSuccess(toastId, "Bem-vindo! Modo demonstração.");
-      navigate("/dashboard");
-    } catch {
-      toastUpdateError(toastId, "Erro ao acessar modo visitante");
-      setLoading(false);
-    }
-  }
+    toastUpdateSuccess(toastId, "Modo demonstração ativo");
+    navigate("/dashboard");
+  }, 600);
+}
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

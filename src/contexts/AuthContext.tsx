@@ -12,7 +12,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "user";
+  role: "admin" | "user" | "visitor";
 }
 
 interface LoginResponse {
@@ -36,8 +36,25 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const signIn = async (email: string, password: string) => {
+    if (email === "visitante@nexbuy.com") {
+      const visitorUser: User = {
+        id: "visitor",
+        name: "Visitante",
+        email: "visitante@nexbuy.com",
+        role: "visitor",
+      };
+
+      localStorage.setItem("@nexbuy:token", "visitor-token");
+      localStorage.setItem("@nexbuy:user", JSON.stringify(visitorUser));
+
+      setUser(visitorUser);
+      return;
+    }
+
+    // 🔹 LOGIN NORMAL
     const data = await loginService({ email, password });
 
     localStorage.setItem("@nexbuy:token", data.token);
@@ -59,14 +76,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
-
-  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = localStorage.getItem("@nexbuy:token");
     const storedUser = localStorage.getItem("@nexbuy:user");
 
     if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser) as User);
     }
 
     setLoading(false);

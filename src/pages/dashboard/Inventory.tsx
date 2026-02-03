@@ -165,21 +165,51 @@ export default function Inventory() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja remover este item do estoque?")) return;
-    const toastId = toast.loading("Removendo...");
-    try {
-      await api.delete(`/products/${id}`);
-      toast.success("Removido com sucesso", { id: toastId });
-      loadProducts();
-    } catch {
-      toast.error("Erro ao remover", { id: toastId });
-    }
-  };
+  const handleDelete = (id: string) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3 min-w-[280px]">
+      <div className="flex items-center gap-2 text-slate-800">
+        <AlertCircle className="text-orange-500" size={20} />
+        <span className="font-medium text-sm">Excluir este produto permanentemente?</span>
+      </div>
+      
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => toast.dismiss(t.id)}
+          className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-lg transition"
+        >
+          Cancelar
+        </button>
+        
+        <button
+          type="button"
+          onClick={async () => {
+            toast.dismiss(t.id);
+            const loadingToast = toast.loading("Removendo...");
+            try {
+              await api.delete(`/products/${id}`);
+              toast.success("Produto removido!", { id: loadingToast });
+              loadProducts();
+            } catch {
+              toast.error("Erro ao excluir", { id: loadingToast });
+            }
+          }}
+          className="px-4 py-1.5 text-xs font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md shadow-red-500/20"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  ), {
+    duration: 5000,
+    position: "top-center",
+  });
+};
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-slate-200 font-sans">
-      {/* BACKGROUND DECORATION */}
+
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-purple-600/10 blur-[120px] rounded-full" />
@@ -187,7 +217,7 @@ export default function Inventory() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 md:px-8 space-y-8">
-        {/* HEADER SECTION */}
+
         <header className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between bg-slate-800/40 backdrop-blur-md p-6 rounded-3xl border border-slate-700/50 shadow-2xl">
           <div className="flex items-center gap-4">
             <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-orange-500 shadow-lg shadow-blue-500/20">
@@ -219,7 +249,7 @@ export default function Inventory() {
           </div>
         </header>
 
-        {/* SEARCH & FILTERS */}
+
         <div className="relative group max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-orange-500 transition-colors" size={20} />
           <input
@@ -231,7 +261,7 @@ export default function Inventory() {
           />
         </div>
 
-        {/* MAIN CONTENT */}
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4">
             <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
@@ -312,7 +342,7 @@ export default function Inventory() {
           </div>
         )}
 
-        {/* MODAL OVERLAY */}
+
         {isModalOpen && (
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
             <div className="animate-in fade-in zoom-in duration-200 bg-slate-900 border border-slate-700 rounded-[2.5rem] shadow-3xl w-full max-w-xl overflow-hidden">
@@ -414,7 +444,7 @@ export default function Inventory() {
       </div>
 
       <footer className="relative z-10 py-12 text-center text-slate-600 text-sm">
-        &copy; 2026 NexBuy System • Gestão de Inventário Premium
+        &copy; 2026 NexBuy • Gestão de Inventário
       </footer>
     </div>
   );

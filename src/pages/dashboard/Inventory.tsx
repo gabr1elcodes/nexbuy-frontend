@@ -48,9 +48,13 @@ export default function Inventory() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const userEmail = localStorage.getItem("@nexbuy:userEmail");
   const isAdmin = userEmail === "gabrieloliveira30p@gmail.com";
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+  const savedTheme = localStorage.getItem("@nexbuy:theme");
+  return savedTheme ? savedTheme === "dark" : true;
+});
 
   const [formData, setFormData] = useState<ProductForm>({
     name: "",

@@ -7,6 +7,7 @@ import {
   Trash2,
   ArrowLeft,
   Package,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import api from "@/services/api";
@@ -22,28 +23,46 @@ interface Product {
   image?: string;
 }
 
+interface ProductForm {
+  name: string;
+  description: string;
+  price: string;
+  stock: string;
+  file: File | null;
+  previewUrl: string | null;
+}
+
 export default function Inventory() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductForm>({
     name: "",
     description: "",
     price: "",
     stock: "",
-    file: null as File | null,
-    previewUrl: null as string | null,
+    file: null,
+    previewUrl: null,
   });
 
+  /* =========================
+     HELPERS
+  ========================= */
+
   const getImageUrl = (image?: string) => {
-    if (!image) return "https://via.placeholder.com/400x250?text=Sem+Imagem";
+    if (!image)
+      return "https://via.placeholder.com/400x260?text=Sem+Imagem";
     if (image.startsWith("http") || image.startsWith("blob:")) return image;
     return `${API_URL}/uploads/${image}`;
   };
+
+  /* =========================
+     API
+  ========================= */
 
   const loadProducts = async () => {
     try {
@@ -60,6 +79,10 @@ export default function Inventory() {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  /* =========================
+     MODAL
+  ========================= */
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -93,6 +116,10 @@ export default function Inventory() {
     }
     setIsModalOpen(false);
   };
+
+  /* =========================
+     FORM
+  ========================= */
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,16 +175,22 @@ export default function Inventory() {
       toast.success("Produto removido", { id: toastId });
       loadProducts();
     } catch {
-      toast.error("Erro ao deletar produto", { id: toastId });
+      toast.error("Erro ao excluir produto", { id: toastId });
     }
   };
 
+  /* =========================
+     UI
+  ========================= */
+
   return (
-    <div className="px-4 py-4 md:px-8 md:py-8 space-y-6 bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-[#f7f9fc] px-4 py-6 md:px-8 space-y-8">
       {/* HEADER */}
-      <div className="flex flex-wrap gap-4 items-center justify-between">
+      <header className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex items-center gap-3">
-          <Package className="text-blue-600" size={32} />
+          <div className="p-3 rounded-xl bg-blue-600/10 text-blue-600">
+            <Package size={26} />
+          </div>
           <h1 className="text-3xl font-bold text-gray-800">
             Inventário
           </h1>
@@ -169,7 +202,7 @@ export default function Inventory() {
             className="flex items-center gap-2 px-4 py-2 rounded-xl border bg-white hover:bg-gray-100 transition"
           >
             <ArrowLeft size={18} />
-            Home
+            Voltar
           </button>
 
           <button
@@ -180,12 +213,19 @@ export default function Inventory() {
             Novo Produto
           </button>
         </div>
-      </div>
+      </header>
 
       {/* CONTENT */}
       {loading ? (
         <div className="text-center text-gray-500 py-20">
           Carregando produtos...
+        </div>
+      ) : products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+          <ImageIcon size={48} />
+          <p className="mt-4 text-lg">
+            Nenhum produto cadastrado
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -200,7 +240,7 @@ export default function Inventory() {
               />
 
               <div className="p-4 space-y-3">
-                <h3 className="font-bold text-lg text-gray-800 truncate">
+                <h3 className="font-semibold text-lg text-gray-800 truncate">
                   {product.name}
                 </h3>
 
@@ -208,16 +248,17 @@ export default function Inventory() {
                   {product.description}
                 </p>
 
-                <div className="flex justify-between text-sm font-medium">
-                  <span className="text-blue-600">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-bold text-blue-600">
                     R$ {product.price}
                   </span>
+
                   <span
-                    className={
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       product.stock > 0
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
                   >
                     Estoque: {product.stock}
                   </span>

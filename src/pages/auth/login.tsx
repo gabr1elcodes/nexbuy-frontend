@@ -4,9 +4,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
+
+import {
+  toastSuccess,
+  toastError,
+  toastLoading,
+  toastUpdateSuccess,
+  toastUpdateError,
+} from "@/utils/toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,45 +27,45 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const googleLogin = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    try {
-      const response = await axios.post(`${API_URL}/auth/google`, {
-        token: tokenResponse.access_token,
-      });
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await axios.post(`${API_URL}/auth/google`, {
+          token: tokenResponse.access_token,
+        });
 
-      if (response.data.token) {
-        signInWithGoogle(response.data);
-        toast.success("Login realizado com sucesso!");
-        navigate("/dashboard");
+        if (response.data.token) {
+          signInWithGoogle(response.data);
+          toastSuccess("Login realizado com sucesso!");
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Erro 401:", error);
+        toastError("Erro de autenticação no servidor");
       }
-    } catch (error) {
-      console.error("Erro 401:", error);
-      toast.error("Erro de autenticação no servidor");
-    }
-  },
-  onError: () => toast.error("Falha no login com Google"),
-});
+    },
+    onError: () => toastError("Falha no login com Google"),
+  });
 
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
-        <span className="animate-pulse text-gray-500">
-          Carregando...
-        </span>
+        <span className="animate-pulse text-gray-500">Carregando...</span>
       </div>
     );
   }
 
   async function handleVisitorLogin() {
     setLoading(true);
-    const toastId = toast.loading("Acessando como visitante...");
+    const toastId = toastLoading("Acessando como visitante...");
+
     try {
       await signIn("visitante@nexbuy.com", "visitante123");
       localStorage.setItem("@nexbuy:userEmail", "visitante@nexbuy.com");
-      toast.success("Bem-vindo! Modo demonstração.", { id: toastId });
+
+      toastUpdateSuccess(toastId, "Bem-vindo! Modo demonstração.");
       navigate("/dashboard");
     } catch {
-      toast.error("Erro ao acessar modo visitante", { id: toastId });
+      toastUpdateError(toastId, "Erro ao acessar modo visitante");
       setLoading(false);
     }
   }
@@ -67,12 +74,14 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const toastId = toast.loading("Entrando...");
+
+    const toastId = toastLoading("Entrando...");
 
     try {
       await signIn(email, password);
       localStorage.setItem("@nexbuy:userEmail", email);
-      toast.success("Login realizado com sucesso!", { id: toastId });
+
+      toastUpdateSuccess(toastId, "Login realizado com sucesso!");
       navigate("/dashboard");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
@@ -80,7 +89,7 @@ export default function Login() {
         : "Erro ao entrar";
 
       setError(message);
-      toast.error(message, { id: toastId });
+      toastUpdateError(toastId, message);
       setLoading(false);
     }
   }
@@ -89,10 +98,10 @@ export default function Login() {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex items-center gap-3 mb-2">
-          <img 
-            src="/logo-nexbuy.png" 
-            alt="NexBuy" 
-            className="w-10 h-10 object-contain" 
+          <img
+            src="/logo-nexbuy.png"
+            alt="NexBuy"
+            className="w-10 h-10 object-contain"
           />
           <span className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Nex<span className="text-orange-500">Buy</span>
@@ -111,7 +120,10 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="group relative">
-            <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+            <Mail
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"
+            />
             <input
               type="email"
               placeholder="Seu e-mail"
@@ -123,7 +135,10 @@ export default function Login() {
           </div>
 
           <div className="group relative">
-            <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+            <Lock
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"
+            />
             <input
               type="password"
               placeholder="Sua senha"
@@ -135,7 +150,10 @@ export default function Login() {
           </div>
 
           <div className="flex justify-end px-1">
-            <Link to="/forgot-password" className="text-sm font-medium text-gray-400 hover:text-orange-600 transition-colors">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-gray-400 hover:text-orange-600 transition-colors"
+            >
               Esqueceu sua senha?
             </Link>
           </div>
@@ -148,48 +166,52 @@ export default function Login() {
             {loading ? "Processando..." : "Entrar"}
           </button>
         </form>
+
         <div className="mt-6 flex flex-row gap-4">
+          <div className="w-1/2">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const response = await axios.post(`${API_URL}/auth/google`, {
+                    token: credentialResponse.credential,
+                  });
 
-        <div className="w-1/2">
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              try {
-                const response = await axios.post(`${API_URL}/auth/google`, {
-                  token: credentialResponse.credential, 
-                });
-
-                if (response.data.token) {
-                  signInWithGoogle(response.data);
-                  toast.success("Login realizado com sucesso!");
-                  navigate("/dashboard");
+                  if (response.data.token) {
+                    signInWithGoogle(response.data);
+                    toastSuccess("Login realizado com sucesso!");
+                    navigate("/dashboard");
+                  }
+                } catch (error) {
+                  console.error("Erro detalhado:", error);
+                  toastError(
+                    "Erro ao autenticar no servidor. Verifique o Secret no Render."
+                  );
                 }
-              } catch (error) {
-                console.error("Erro detalhado:", error);
-                toast.error("Erro ao autenticar no servidor. Verifique o Secret no Render.");
-              }
-            }}
-            onError={() => toast.error("Falha no login com Google")}
-            theme="outline"
-            size="large"
-            shape="pill"
-            width="100%"
-          />
+              }}
+              onError={() => toastError("Falha no login com Google")}
+              theme="outline"
+              size="large"
+              shape="pill"
+              width="100%"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleVisitorLogin}
+            className="w-1/2 flex items-center justify-center gap-2 h-[40px] rounded-full border border-[#dadce0] bg-white font-medium text-[#3c4043] hover:bg-[#f8f9fa] hover:border-[#d2e3fc] transition-all text-sm"
+          >
+            <UserCheck size={18} className="text-orange-500" />
+            Acessar como Visitante
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleVisitorLogin}
-          className="w-1/2 flex items-center justify-center gap-2 h-[40px] rounded-full border border-[#dadce0] bg-white font-medium text-[#3c4043] hover:bg-[#f8f9fa] hover:border-[#d2e3fc] transition-all text-sm"
-        >
-          <UserCheck size={18} className="text-orange-500" />
-          Acessar como Visitante
-        </button>
-      </div>
-
 
         <p className="mt-8 text-center text-sm text-gray-500">
           Não tem uma conta?{" "}
-          <Link to="/register" className="font-bold text-orange-500 hover:text-orange-600 transition-colors">
+          <Link
+            to="/register"
+            className="font-bold text-orange-500 hover:text-orange-600 transition-colors"
+          >
             Cadastre-se
           </Link>
         </p>

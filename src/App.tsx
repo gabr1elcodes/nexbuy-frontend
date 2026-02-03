@@ -1,11 +1,11 @@
 import AppRoutes from "@/routes";
-import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Toast from "@/components/layout/Toast";
 
 export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <Toaster position="top-right" />
+      <Toast />
       <AppRoutes />
     </GoogleOAuthProvider>
   );

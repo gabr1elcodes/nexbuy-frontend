@@ -4,7 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { register as registerService } from "@/services/auth/auth.service";
 import axios from "axios";
-import toast from "react-hot-toast";
+
+import {
+  toastLoading,
+  toastUpdateSuccess,
+  toastUpdateError,
+} from "@/utils/toast";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,7 +20,6 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ADIÇÃO DA LÓGICA DE LOADING
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -31,15 +35,12 @@ export default function Register() {
     setLoading(true);
     setError("");
 
-    const toastId = toast.loading("Criando sua conta...");
+    const toastId = toastLoading("Criando sua conta...");
 
     try {
       await registerService({ name, email, password });
 
-      toast.success("Conta criada com sucesso!", {
-        id: toastId,
-        duration: 2000,
-      });
+      toastUpdateSuccess(toastId, "Conta criada com sucesso!");
 
       setTimeout(() => {
         navigate("/login");
@@ -54,11 +55,8 @@ export default function Register() {
             : "Não foi possível criar a conta";
 
       setError(message);
-
-      toast.error(message, {
-        id: toastId,
-      });
-      setLoading(false); // Garante que o loading pare em caso de erro
+      toastUpdateError(toastId, message);
+      setLoading(false);
     }
   };
 
@@ -79,13 +77,15 @@ export default function Register() {
 
       <form className="flex flex-col gap-4 max-w-md" onSubmit={handleRegister}>
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={18} />
-
+          <User
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+            size={18}
+          />
           <input
             type="text"
             placeholder="Seu nome completo"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200
                        focus:outline-none focus:ring-2 focus:ring-orange-400"
             required
@@ -93,12 +93,15 @@ export default function Register() {
         </div>
 
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={18} />
+          <Mail
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+            size={18}
+          />
           <input
             type="email"
             placeholder="Seu e-mail"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200
                        focus:outline-none focus:ring-2 focus:ring-orange-400"
             required
@@ -106,12 +109,15 @@ export default function Register() {
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={18} />
+          <Lock
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+            size={18}
+          />
           <input
             type="password"
             placeholder="Crie uma senha"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200
                        focus:outline-none focus:ring-2 focus:ring-orange-400"
             required
@@ -131,7 +137,10 @@ export default function Register() {
 
       <p className="text-sm text-gray-500 mt-8">
         Já tem uma conta?{" "}
-        <Link to="/login" className="text-orange-500 font-medium hover:underline">
+        <Link
+          to="/login"
+          className="text-orange-500 font-medium hover:underline"
+        >
           Faça login
         </Link>
       </p>

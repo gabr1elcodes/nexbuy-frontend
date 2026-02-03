@@ -3,14 +3,18 @@ import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "@/services/auth/auth.service";
-import toast from "react-hot-toast";
+
+import {
+  toastLoading,
+  toastUpdateSuccess,
+  toastUpdateError,
+} from "@/utils/toast";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ADIÇÃO DA LÓGICA DE LOADING
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -26,16 +30,22 @@ export default function ForgotPassword() {
     setError(null);
     setLoading(true);
 
+    const toastId = toastLoading("Enviando instruções...");
+
     try {
       await forgotPassword(email);
-      toast.success(
+
+      toastUpdateSuccess(
+        toastId,
         "Se o e-mail estiver cadastrado, você receberá as instruções."
       );
     } catch (err: any) {
-      toast.error(
+      const message =
         err?.response?.data?.message ||
-        "Não foi possível enviar as instruções."
-      );
+        "Não foi possível enviar as instruções.";
+
+      setError(message);
+      toastUpdateError(toastId, message);
     } finally {
       setLoading(false);
     }

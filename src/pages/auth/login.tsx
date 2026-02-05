@@ -172,7 +172,7 @@ export default function Login() {
         </form>
 
         <div className="mt-6 flex flex-row gap-4">
-          <div className="w-1/2">
+          <div className="w-1/2 mx-auto">
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 try {
@@ -196,7 +196,7 @@ export default function Login() {
               theme="outline"
               size="large"
               shape="pill"
-              width="100%"
+              width={300}
             />
           </div>
 
